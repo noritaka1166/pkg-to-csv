@@ -14,6 +14,8 @@ interface Dependency {
 interface PackageMeta {
   latestVersion: string;
   license: string;
+  description: string;
+  npmLink: string;
 }
 
 interface ResultRow {
@@ -22,6 +24,8 @@ interface ResultRow {
   type: string;
   latestVersion?: string;
   license?: string;
+  description?: string;
+  npmLink?: string;
 }
 
 program
@@ -29,6 +33,8 @@ program
   .option('-o, --output [path]', 'Output CSV file (default: <repo>_package.csv)')
   .option('--latest', 'Include latest version info from npm')
   .option('--license', 'Include license info from npm')
+  .option('--description', 'Include description from npm')
+  .option('--npm-link', 'Include npm package link')
   .option('--deps-only', 'Include only dependencies (exclude devDependencies)')
   .option('--dev-only', 'Include only devDependencies (exclude dependencies)')
   .parse(process.argv);
@@ -83,9 +89,11 @@ async function getPackageMeta(name: string): Promise<PackageMeta> {
     const data: any = await res.json();
     const latestVersion: string = data['dist-tags']?.latest || '';
     const license: string = data.license || (data.versions?.[latestVersion]?.license || '');
-    return { latestVersion, license };
+    const description = data.description || '';
+    const npmLink = `https://www.npmjs.com/package/${name}`;
+    return { latestVersion, license, description, npmLink };
   } catch {
-    return { latestVersion: '', license: '' };
+    return { latestVersion: '', license: '', description: '', npmLink: '' };
   }
 }
 
@@ -95,10 +103,15 @@ async function getPackageMeta(name: string): Promise<PackageMeta> {
   for (const dep of allDeps) {
     let latestVersion = '';
     let license = '';
+    let description = '';
+    let npmLink = '';
+
     if (options.latest || options.license) {
       const meta = await getPackageMeta(dep.name);
       if (options.latest) latestVersion = meta.latestVersion;
       if (options.license) license = meta.license;
+      if (options.description) description = meta.description;
+      if (options.npmLink) npmLink = meta.npmLink;
     }
 
     result.push({
@@ -107,6 +120,8 @@ async function getPackageMeta(name: string): Promise<PackageMeta> {
       type: dep.type,
       ...(options.latest ? { latestVersion } : {}),
       ...(options.license ? { license } : {}),
+      ...(options.description ? { description } : {}),
+      ...(options.npmLink ? { npmLink } : {}),
     });
   }
 
