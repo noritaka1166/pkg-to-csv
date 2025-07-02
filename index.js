@@ -10,6 +10,8 @@ program
   .option('-o, --output [path]', 'Output CSV file (default: <repo>_package.csv)')
   .option('--latest', 'Include latest version info from npm')
   .option('--license', 'Include license info from npm')
+  .option('--deps-only', 'Include only dependencies (exclude devDependencies)')
+  .option('--dev-only', 'Include only devDependencies (exclude dependencies)')
   .parse(process.argv);
 
 const options = program.opts();
@@ -43,8 +45,18 @@ function collectDeps(deps, type) {
   }
 }
 
-collectDeps(pkgJson.dependencies, 'dependencies');
-collectDeps(pkgJson.devDependencies, 'devDependencies');
+// オプションに基づいて依存関係を収集
+if (options.devOnly) {
+  // devDependencies のみ
+  collectDeps(pkgJson.devDependencies, 'devDependencies');
+} else if (options.depsOnly) {
+  // dependencies のみ
+  collectDeps(pkgJson.dependencies, 'dependencies');
+} else {
+  // 両方（デフォルト）
+  collectDeps(pkgJson.dependencies, 'dependencies');
+  collectDeps(pkgJson.devDependencies, 'devDependencies');
+}
 
 async function getPackageMeta(name) {
   try {
