@@ -1,6 +1,7 @@
 {
   "name": "pkg-to-csv",
   "version": "1.0.0",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -9,7 +10,11 @@
     "dev": "tsc && node dist/index.js",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run clean && npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run build && node --test test/*.test.js",
+    "test:unit": "npm run build && node --test test/unit.test.js",
+    "test:integration": "npm run build && node --test test/index.test.js",
+    "test:error": "npm run build && node --test test/error-handling.test.js",
+    "test:npm": "npm run build && node --test test/npm-integration.test.js"
   },
   "keywords": [],
   "author": "",
