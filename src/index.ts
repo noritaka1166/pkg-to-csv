@@ -67,7 +67,7 @@ function findPackageJsonFiles(inputPath: string, recursive: boolean = false): Pa
     const content = JSON.parse(fs.readFileSync(resolvedPath, 'utf-8'));
     packages.push({
       path: resolvedPath,
-      name: content.name || path.basename(path.dirname(resolvedPath)),
+      name: content.name ?? path.basename(path.dirname(resolvedPath)),
       content
     });
   } else if (stat.isDirectory()) {
@@ -77,7 +77,7 @@ function findPackageJsonFiles(inputPath: string, recursive: boolean = false): Pa
       const content = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
       packages.push({
         path: packageJsonPath,
-        name: content.name || path.basename(resolvedPath),
+        name: content.name ?? path.basename(resolvedPath),
         content
       });
     }
@@ -148,8 +148,8 @@ async function getPackageMeta(name: string): Promise<PackageMeta> {
     const res = await fetch(`https://registry.npmjs.org/${name}`);
     if (!res.ok) throw new Error();
     const data: any = await res.json();
-    const latestVersion: string = data['dist-tags']?.latest || '';
-    const license: string = data.license || (data.versions?.[latestVersion]?.license || '');
+    const latestVersion: string = data['dist-tags']?.latest ?? '';
+    const license: string = data.license ?? (data.versions?.[latestVersion]?.license ?? '');
     const description = data.description || '';
     const npmLink = `https://www.npmjs.com/package/${name}`;
     return { latestVersion, license, description, npmLink };
