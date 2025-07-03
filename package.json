@@ -14,7 +14,11 @@
     "test:unit": "npm run build && node --test test/unit.test.js",
     "test:integration": "npm run build && node --test test/index.test.js",
     "test:error": "npm run build && node --test test/error-handling.test.js",
-    "test:npm": "npm run build && node --test test/npm-integration.test.js"
+    "test:npm": "npm run build && node --test test/npm-integration.test.js",
+    "test:coverage": "npm run build && c8 --reporter=text --reporter=html node --test test/*.test.js",
+    "test:coverage:lcov": "npm run build && c8 --reporter=lcov --reports-dir=coverage node --test test/*.test.js",
+    "test:coverage:sonar": "npm run test:coverage:lcov && npm run coverage:sonar-format",
+    "coverage:sonar-format": "node scripts/format-coverage-for-sonar.js"
   },
   "keywords": [],
   "author": "",
@@ -33,6 +37,7 @@
   "devDependencies": {
     "@types/node": "^24.0.10",
     "@types/node-fetch": "^2.6.12",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "c8": "^10.1.2"
   }
 }
