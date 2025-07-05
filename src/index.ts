@@ -150,7 +150,7 @@ async function getPackageMeta(name: string): Promise<PackageMeta> {
     const data: any = await res.json();
     const latestVersion: string = data['dist-tags']?.latest ?? '';
     const license: string = data.license ?? (data.versions?.[latestVersion]?.license ?? '');
-    const description = data.description || '';
+    const description = data.description ?? '';
     const npmLink = `https://www.npmjs.com/package/${name}`;
     return { latestVersion, license, description, npmLink };
   } catch {
