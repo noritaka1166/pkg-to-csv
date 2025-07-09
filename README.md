@@ -1,93 +1,96 @@
 # pkg-to-csv
 
-package.jsonファイルから依存関係をCSV形式で出力するツールです。モノレポや複数リポジトリに対応しており、どのプロジェクトの依存関係かを識別できます。
+A tool to extract dependencies from package.json files and output them in CSV format. It supports monorepos and multiple repositories, allowing you to identify which project the dependencies belong to.
 
-## 機能
+**日本語版 README は[こちら](README.ja.md)**
 
-- 単一または複数のpackage.jsonファイルから依存関係を抽出
-- モノレポ対応（再帰的検索）
-- プロジェクト名とパスを含む出力
-- npm レジストリから最新バージョン、ライセンス、説明を取得
-- dependencies と devDependencies の選択的出力
-- CSV形式での出力またはコンソール表示
+## Features
 
-## インストール
+- Extract dependencies from single or multiple package.json files
+- Monorepo support (recursive search)
+- Output includes project name and path
+- Fetch latest version, license, and description from npm registry
+- Selective output of dependencies and devDependencies
+- CSV format output or console display
+
+## Installation
 
 ```bash
 npm install -g pkg-to-csv
 ```
 
-## 使用方法
+## Usage
 
-### 基本的な使用方法
+### Basic Usage
 
 ```bash
-# 現在のディレクトリのpackage.jsonを処理
+# Process package.json in current directory
 pkg-to-csv
 
-# 特定のpackage.jsonファイルを指定
+# Specify a package.json file
 pkg-to-csv -i path/to/package.json
 
-# ディレクトリを指定（そのディレクトリのpackage.jsonを処理）
+# Specify a directory (processes package.json in that directory)
 pkg-to-csv -i path/to/project
 
-# 再帰的にpackage.jsonファイルを検索（モノレポ対応）
+# Recursively search for package.json files (monorepo support)
 pkg-to-csv -i . --recursive
 
-# CSV出力
+# CSV output
 pkg-to-csv -o packages.csv
 ```
 
-### オプション
+### Options
 
-- `-i, --input <path>`: package.jsonファイルまたはディレクトリのパス（デフォルト: package.json）
-- `-o, --output [path]`: 出力CSVファイル（デフォルト: packages.csv）
-- `--recursive`: サブディレクトリを再帰的に検索してpackage.jsonファイルを見つける
-- `--latest`: npmから最新バージョン情報を取得
-- `--license`: npmからライセンス情報を取得
-- `--description`: npmから説明を取得
-- `--npm-link`: npmパッケージリンクを含める
-- `--deps-only`: dependenciesのみを含める（devDependenciesを除外）
-- `--dev-only`: devDependenciesのみを含める（dependenciesを除外）
+- `-i, --input <path>`: Path to package.json file or directory (default: package.json)
+- `-o, --output [path]`: Output CSV file (default: packages.csv)
+- `--recursive`: Recursively search subdirectories for package.json files
+- `--latest`: Fetch latest version information from npm
+- `--license`: Fetch license information from npm
+- `--description`: Fetch description from npm
+- `--npm-link`: Include npm package links
+- `--deps-only`: Include only dependencies (exclude devDependencies)
+- `--dev-only`: Include only devDependencies (exclude dependencies)
 
-### 出力形式
+### Output Format
 
-CSV出力には以下の列が含まれます：
+The CSV output includes the following columns:
 
-- `projectName`: package.jsonのnameフィールド
-- `projectPath`: プロジェクトの相対パス
-- `package`: パッケージ名
-- `version`: インストールされているバージョン
-- `type`: 依存関係の種類（dependencies または devDependencies）
-- `latestVersion`: 最新バージョン（--latestオプション使用時）
-- `license`: ライセンス（--licenseオプション使用時）
-- `description`: 説明（--descriptionオプション使用時）
-- `npmLink`: npmリンク（--npm-linkオプション使用時）
+- `projectName`: The name field from package.json
+- `projectPath`: Relative path to the project
+- `package`: Package name
+- `version`: Installed version
+- `type`: Dependency type (dependencies or devDependencies)
+- `latestVersion`: Latest version (when --latest option is used)
+- `license`: License (when --license option is used)
+- `description`: Description (when --description option is used)
+- `npmLink`: npm link (when --npm-link option is used)
 
-### 使用例
+### Examples
 
 ```bash
-# モノレポ全体の依存関係を最新バージョン情報付きでCSV出力
+# Output all dependencies from a monorepo with latest version info to CSV
 pkg-to-csv -i . --recursive --latest --license -o all-packages.csv
 
-# 特定のプロジェクトのproduction依存関係のみ
+# Production dependencies only from a specific project
 pkg-to-csv -i packages/frontend --deps-only -o frontend-deps.csv
 
-# 開発依存関係のみをコンソールに表示
+# Development dependencies only displayed in console
 pkg-to-csv --dev-only
 ```
 
-## 開発
+## Development
 
 ```bash
-# 依存関係のインストール
+# Install dependencies
 npm install
 
-# ビルド
+# Build
 npm run build
 
-# 開発実行
+# Run in development mode
 npm run dev
 
-# クリーンアップ
+# Clean up
 npm run clean
+```
