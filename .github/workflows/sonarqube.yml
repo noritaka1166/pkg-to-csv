@@ -4,11 +4,16 @@ on:
   push:
     branches: [ main, master, develop ]
   pull_request:
-    branches: [ main, master ]
+    types:
+      - labeled
+  pull_request_target:
+    types:
+      - labeled
 
 jobs:
   sonarqube:
     name: SonarQube Analysis
+    if: github.event_name == 'push' || github.event.label.name == 'run-sonar'
     runs-on: ubuntu-latest
     
     steps:
