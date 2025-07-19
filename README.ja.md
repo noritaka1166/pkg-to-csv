@@ -19,29 +19,49 @@ npm install -g pkg-to-csv
 
 ## 使用方法
 
-### 基本的な使用方法
+pkg-to-csv は2つの動作モードを提供します：
+
+### インタラクティブモード（デフォルト）
+
+引数なしまたは `--interactive` で実行すると、インタラクティブなインターフェースが起動します：
+
+```bash
+# インタラクティブモードを起動
+pkg-to-csv
+
+# 明示的にインタラクティブモードを起動
+pkg-to-csv --interactive
+```
+
+インタラクティブモードでは以下の操作が可能です：
+- 入力パス（package.json ファイルまたはディレクトリ）の設定
+- 出力ファイルパスの設定
+- 各種オプション（最新バージョン、ライセンス情報等）の切り替え
+- 実行前の設定プレビュー
+
+### CLIモード
+
+自動化スクリプトや高度な使用には、コマンドライン引数を使用します：
 
 ```bash
 # 現在のディレクトリのpackage.jsonを処理
-pkg-to-csv
+pkg-to-csv -i package.json -o packages.csv
 
 # 特定のpackage.jsonファイルを指定
-pkg-to-csv -i path/to/package.json
+pkg-to-csv -i path/to/package.json -o output.csv
 
 # ディレクトリを指定（そのディレクトリのpackage.jsonを処理）
-pkg-to-csv -i path/to/project
+pkg-to-csv -i path/to/project -o packages.csv
 
 # 再帰的にpackage.jsonファイルを検索（モノレポ対応）
-pkg-to-csv -i . --recursive
-
-# CSV出力
-pkg-to-csv -o packages.csv
+pkg-to-csv -i . --recursive -o all-packages.csv
 ```
 
 ### オプション
 
 - `-i, --input <path>`: package.json ファイルまたはディレクトリのパス（デフォルト: package.json）
 - `-o, --output [path]`: 出力 CSV ファイル（デフォルト: packages.csv）
+- `--interactive`: インタラクティブモードを起動
 - `--recursive`: サブディレクトリを再帰的に検索して package.json ファイルを見つける
 - `--latest`: npm から最新バージョン情報を取得
 - `--license`: npm からライセンス情報を取得
@@ -66,6 +86,16 @@ CSV 出力には以下の列が含まれます：
 
 ### 使用例
 
+#### インタラクティブモードの例
+```bash
+# インタラクティブモードを起動（デフォルト動作）
+pkg-to-csv
+
+# UIを通じて全てのオプションを設定
+pkg-to-csv --interactive
+```
+
+#### CLIモードの例
 ```bash
 # モノレポ全体の依存関係を最新バージョン情報付きでCSV出力
 pkg-to-csv -i . --recursive --latest --license -o all-packages.csv
@@ -73,8 +103,11 @@ pkg-to-csv -i . --recursive --latest --license -o all-packages.csv
 # 特定のプロジェクトのproduction依存関係のみ
 pkg-to-csv -i packages/frontend --deps-only -o frontend-deps.csv
 
-# 開発依存関係のみをコンソールに表示
-pkg-to-csv --dev-only
+# 開発依存関係のみをデフォルトCSV出力
+pkg-to-csv -i . --dev-only -o dev-dependencies.csv
+
+# 出力ファイルなしでコンソール表示
+pkg-to-csv -i . -o false
 ```
 
 ## 開発
