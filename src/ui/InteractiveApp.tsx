@@ -3,11 +3,10 @@ import { Box, Text } from 'ink';
 import BigText from 'ink-big-text';
 import SelectInput from 'ink-select-input';
 import TextInput from 'ink-text-input';
-import Spinner from 'ink-spinner';
 import { CliOptions, SelectItem, InteractiveAppProps } from '../types/index.js';
 
 export default function InteractiveApp({ onComplete }: InteractiveAppProps) {
-  const [step, setStep] = useState<'main' | 'input' | 'output' | 'options' | 'confirm' | 'processing'>('main');
+  const [step, setStep] = useState<'main' | 'input' | 'output' | 'options' | 'confirm'>('main');
   const [options, setOptions] = useState<Partial<CliOptions>>({
     input: 'package.json'
   });
