@@ -18,7 +18,6 @@ RUN apt update && apt install -y less \
   ipset \
   iproute2 \
   dnsutils \
-  aggregate \
   jq
 
 # Ensure default node user has access to /usr/local/share
@@ -28,8 +27,8 @@ RUN mkdir -p /usr/local/share/npm-global && \
 ARG USERNAME=node
 
 # Persist bash history.
-RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
-  && mkdir /commandhistory \
+ENV SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history"
+RUN mkdir /commandhistory \
   && touch /commandhistory/.bash_history \
   && chown -R $USERNAME /commandhistory
 

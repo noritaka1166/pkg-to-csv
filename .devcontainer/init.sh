@@ -65,7 +65,7 @@ while read -r cidr; do
         echo "ERROR: Invalid CIDR range from GitHub meta: $cidr"
         exit 1
     fi
-done < <(echo "$gh_ranges" | jq -r '(.web + .api + .git)[]' | aggregate -q)
+done < <(echo "$gh_ranges" | jq -r '(.web + .api + .git)[]' | sort -u)
 
 # Resolve and add other allowed domains (IPv4 only)
 for domain in \
@@ -77,10 +77,11 @@ for domain in \
     echo "Resolving $domain (IPv4 only)..."
     
     # Resolve IPv4 addresses only
-    ips=$(dig +short A "$domain")
-    if [ -z "$ips" ]; then
-        echo "ERROR: Failed to resolve IPv4 addresses for $domain"
-        exit 1
+    # Fallback to getent if dig is unavailable
+    if command -v dig >/dev/null 2>&1; then
+        ips=$(dig +short A "$domain")
+    else
+        ips=$(getent ahostsv4 "$domain" | awk '{print $1}' | sort -u)
     fi
     
     while read -r ip; do
@@ -120,7 +121,7 @@ iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 
 # Then allow only specific outbound traffic to allowed domains (IPv4 only)
-iptables -A OUTPUT -m set --match-set allowed-domains dst -j ACCEPT
+iptables -A OUTPUT -p tcp -m set --match-set allowed-domains dst -m multiport --dports 443,80,9418 -j ACCEPT
 
 echo "Firewall configuration complete"
 echo "Verifying firewall rules..."
