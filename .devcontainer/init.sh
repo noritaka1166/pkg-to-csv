@@ -15,7 +15,16 @@ iptables -t mangle -F
 iptables -t mangle -X
 ipset destroy allowed-domains 2>/dev/null || true
 
+# IPv6 - completely disable
+ip6tables -F
+ip6tables -X
+ip6tables -t nat -F
+ip6tables -t nat -X
+ip6tables -t mangle -F
+ip6tables -t mangle -X
+
 # First allow DNS and localhost before any restrictions
+# IPv4 rules
 # Allow outbound DNS
 iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
 # Allow inbound DNS responses
@@ -28,7 +37,8 @@ iptables -A INPUT -p tcp --sport 22 -m state --state ESTABLISHED -j ACCEPT
 iptables -A INPUT -i lo -j ACCEPT
 iptables -A OUTPUT -o lo -j ACCEPT
 
-# Create ipset with CIDR support
+
+# Create ipset with CIDR support (IPv4 only)
 ipset create allowed-domains hash:net
 
 # Fetch GitHub meta information and aggregate + add their IP ranges
@@ -44,64 +54,72 @@ if ! echo "$gh_ranges" | jq -e '.web and .api and .git' >/dev/null; then
     exit 1
 fi
 
-echo "Processing GitHub IPs..."
+echo "Processing GitHub IPs (IPv4 only)..."
 while read -r cidr; do
-    if [[ ! "$cidr" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/[0-9]{1,2}$ ]]; then
+    if [[ "$cidr" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/[0-9]{1,2}$ ]]; then
+        echo "Adding IPv4 GitHub range $cidr"
+        ipset add allowed-domains "$cidr"
+    elif [[ "$cidr" =~ ^[0-9a-fA-F:]+/[0-9]{1,3}$ ]]; then
+        echo "Ignoring IPv6 GitHub range $cidr (IPv6 disabled)"
+    else
         echo "ERROR: Invalid CIDR range from GitHub meta: $cidr"
         exit 1
     fi
-    echo "Adding GitHub range $cidr"
-    ipset add allowed-domains "$cidr"
 done < <(echo "$gh_ranges" | jq -r '(.web + .api + .git)[]' | aggregate -q)
 
-# Resolve and add other allowed domains
+# Resolve and add other allowed domains (IPv4 only)
 for domain in \
     "registry.npmjs.org" \
     "api.anthropic.com" \
     "sentry.io" \
     "statsig.anthropic.com" \
     "statsig.com"; do
-    echo "Resolving $domain..."
+    echo "Resolving $domain (IPv4 only)..."
+    
+    # Resolve IPv4 addresses only
     ips=$(dig +short A "$domain")
     if [ -z "$ips" ]; then
-        echo "ERROR: Failed to resolve $domain"
+        echo "ERROR: Failed to resolve IPv4 addresses for $domain"
         exit 1
     fi
     
     while read -r ip; do
-        if [[ ! "$ip" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
-            echo "ERROR: Invalid IP from DNS for $domain: $ip"
-            exit 1
+        if [[ "$ip" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+            echo "Adding IPv4 $ip for $domain"
+            ipset add allowed-domains "$ip"
         fi
-        echo "Adding $ip for $domain"
-        ipset add allowed-domains "$ip"
     done < <(echo "$ips")
 done
 
-# Get host IP from default route
+# Get host IP from default route (IPv4 only)
 HOST_IP=$(ip route | grep default | cut -d" " -f3)
 if [ -z "$HOST_IP" ]; then
-    echo "ERROR: Failed to detect host IP"
+    echo "ERROR: Failed to detect host IPv4"
     exit 1
 fi
 
 HOST_NETWORK=$(echo "$HOST_IP" | sed "s/\.[0-9]*$/.0\/24/")
-echo "Host network detected as: $HOST_NETWORK"
+echo "Host IPv4 network detected as: $HOST_NETWORK"
 
-# Set up remaining iptables rules
+# Set up remaining iptables rules (IPv4 only)
 iptables -A INPUT -s "$HOST_NETWORK" -j ACCEPT
 iptables -A OUTPUT -d "$HOST_NETWORK" -j ACCEPT
 
-# Set default policies to DROP first
+# Set default policies to DROP first (IPv4)
 iptables -P INPUT DROP
 iptables -P FORWARD DROP
 iptables -P OUTPUT DROP
 
-# First allow established connections for already approved traffic
+# Completely block IPv6 traffic
+ip6tables -P INPUT DROP
+ip6tables -P FORWARD DROP
+ip6tables -P OUTPUT DROP
+
+# First allow established connections for already approved traffic (IPv4 only)
 iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 
-# Then allow only specific outbound traffic to allowed domains
+# Then allow only specific outbound traffic to allowed domains (IPv4 only)
 iptables -A OUTPUT -m set --match-set allowed-domains dst -j ACCEPT
 
 echo "Firewall configuration complete"
