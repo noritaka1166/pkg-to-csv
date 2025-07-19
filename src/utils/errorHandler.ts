@@ -5,7 +5,7 @@ export class AppError extends Error {
   }
 }
 
-export function handleAsyncOperation<T>(
+export async function handleAsyncOperation<T>(
   operation: () => Promise<T>,
   errorMessage: string
 ): Promise<T> {
@@ -14,24 +14,20 @@ export function handleAsyncOperation<T>(
   });
 }
 
-export function withRetry<T>(
+export async function withRetry<T>(
   operation: () => Promise<T>,
   retries: number = 3,
   delay: number = 1000
 ): Promise<T> {
-  return new Promise(async (resolve, reject) => {
-    for (let attempt = 1; attempt <= retries; attempt++) {
-      try {
-        const result = await operation();
-        resolve(result);
-        return;
-      } catch (error) {
-        if (attempt === retries) {
-          reject(error);
-          return;
-        }
-        await new Promise(resolve => setTimeout(resolve, delay * attempt));
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return operation();
+    } catch (error) {
+      if (attempt === retries) {
+        throw error;
       }
+      await new Promise(resolve => setTimeout(resolve, delay * attempt));
     }
-  });
+  }
+  throw new Error('Unreachable code');
 }

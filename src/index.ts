@@ -14,8 +14,7 @@ async function main(): Promise<void> {
     if (options.interactive || process.argv.length <= 2) {
       const app = render(React.createElement(InteractiveApp, {
         onComplete: async (interactiveOptions: CliOptions) => {
-          // Move cursor to end of current content before unmounting
-          process.stdout.write('\n'.repeat(1));
+          process.stdout.write('\n');
           app.unmount();
           await processPackages(interactiveOptions);
           process.exit(0);
@@ -25,7 +24,7 @@ async function main(): Promise<void> {
         exitOnCtrlC: true
       });
     } else {
-      await processPackages(options as CliOptions);
+      await processPackages(options);
     }
   } catch (error) {
     console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);

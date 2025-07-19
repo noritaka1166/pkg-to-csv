@@ -13,7 +13,7 @@ export function setupCli(): CliOptions {
     .option('--dev-only', 'Include only devDependencies (exclude dependencies)')
     .option('--recursive', 'Recursively search for package.json files in subdirectories')
     .option('--interactive', 'Launch interactive mode')
-    .parse(process.argv);
 
+  program.parse(process.argv);
   return program.opts() as CliOptions;
 }

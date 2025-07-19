@@ -6,7 +6,7 @@ import TextInput from 'ink-text-input';
 import { CliOptions, SelectItem, InteractiveAppProps } from '../types/index.js';
 
 export default function InteractiveApp({ onComplete }: InteractiveAppProps) {
-  const [step, setStep] = useState<'main' | 'input' | 'output' | 'options' | 'confirm'>('main');
+  const [step, setStep] = useState<string>('main'); // 'main' | 'input' | 'output' | 'options' | 'confirm'
   const [options, setOptions] = useState<Partial<CliOptions>>({
     input: 'package.json'
   });
@@ -34,7 +34,7 @@ export default function InteractiveApp({ onComplete }: InteractiveAppProps) {
     if (item.value === 'exit') {
       process.exit(0);
     }
-    setStep(item.value as any);
+    setStep(item.value);
   };
 
   const handleOptionToggle = (item: SelectItem) => {
@@ -100,7 +100,7 @@ export default function InteractiveApp({ onComplete }: InteractiveAppProps) {
         <Box flexDirection="column">
           <Text color="cyan">Enter output file path:</Text>
           <TextInput
-            value={options.output as string || ''}
+            value={typeof options.output === 'string' ? options.output : ''}
             onChange={(value) => setOptions(prev => ({ ...prev, output: value }))}
             onSubmit={() => setStep('main')}
             placeholder="packages.csv"
