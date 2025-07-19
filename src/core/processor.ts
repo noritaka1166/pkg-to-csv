@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { CliOptions, PackageInfo, ResultRow } from '../types.js';
+import { CliOptions, PackageInfo, ResultRow } from '../types/index.js';
 import { findPackageJsonFiles, resolveOutputPath } from '../utils/fileUtils.js';
 import { collectDepsFromPackage } from '../utils/dependencyCollector.js';
 import { getPackageMetaBatch } from '../services/npmApi.js';

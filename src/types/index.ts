@@ -4,7 +4,7 @@
 export interface Dependency {
   readonly name: string;
   readonly version: string;
-  readonly type: 'dependencies' | 'devDependencies';
+  readonly type: "dependencies" | "devDependencies";
 }
 
 /**
@@ -65,4 +65,17 @@ export interface CliOptions {
   readonly depsOnly?: boolean;
   readonly devOnly?: boolean;
   readonly recursive?: boolean;
+  readonly interactive?: boolean;
+}
+
+/**
+ * UI component types
+ */
+export interface SelectItem {
+  readonly label: string;
+  readonly value: string;
+}
+
+export interface InteractiveAppProps {
+  readonly onComplete: (options: CliOptions) => void;
 }

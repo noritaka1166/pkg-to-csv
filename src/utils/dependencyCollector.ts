@@ -1,4 +1,4 @@
-import { Dependency, PackageInfo, CliOptions, PackageJsonContent } from '../types.js';
+import { Dependency, PackageInfo, CliOptions, PackageJsonContent } from '../types/index.js';
 
 /**
  * Collects dependencies from a package.json file based on CLI options

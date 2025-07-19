@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { ResultRow } from '../types.js';
+import { ResultRow } from '../types/index.js';
 
 export function generateCsv(data: ResultRow[]): string {
   if (data.length === 0) {

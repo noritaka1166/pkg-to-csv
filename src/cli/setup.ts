@@ -1,5 +1,5 @@
 import { program } from 'commander';
-import { CliOptions } from '../types.js';
+import { CliOptions } from '../types/index.js';
 
 export function setupCli(): CliOptions {
   program
@@ -12,6 +12,7 @@ export function setupCli(): CliOptions {
     .option('--deps-only', 'Include only dependencies (exclude devDependencies)')
     .option('--dev-only', 'Include only devDependencies (exclude dependencies)')
     .option('--recursive', 'Recursively search for package.json files in subdirectories')
+    .option('--interactive', 'Launch interactive mode')
     .parse(process.argv);
 
   return program.opts() as CliOptions;

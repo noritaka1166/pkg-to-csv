@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { PackageInfo, PackageJsonContent } from '../types.js';
+import { PackageInfo, PackageJsonContent } from '../types/index.js';
 
 /**
  * Finds and parses package.json files in the given path
@@ -67,7 +67,7 @@ function readPackageJson(filePath: string): PackageJsonContent {
  */
 export function resolveOutputPath(output?: string | boolean): string | null {
   if (output === undefined) {
-    return null;
+    return path.resolve(process.cwd(), 'packages.csv');
   }
   
   if (typeof output === 'string') {

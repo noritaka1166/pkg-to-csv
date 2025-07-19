@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { PackageMeta } from '../types.js';
+import { PackageMeta } from '../types/index.js';
 import { withRetry } from '../utils/errorHandler.js';
 
 const cache = new Map<string, PackageMeta>();
@@ -21,13 +21,18 @@ export async function getPackageMeta(name: string): Promise<PackageMeta> {
 
   try {
     const meta = await withRetry(async () => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      
       const res = await fetch(`https://registry.npmjs.org/${name}`, {
-        timeout: 10000,
+        signal: controller.signal,
         headers: {
           'Accept': 'application/json',
           'User-Agent': 'pkg-to-csv'
         }
       });
+      
+      clearTimeout(timeoutId);
       
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}: ${res.statusText}`);
