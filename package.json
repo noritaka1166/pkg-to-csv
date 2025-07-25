@@ -15,6 +15,7 @@
     "test:integration": "npm run build && node --test test/index.test.js",
     "test:error": "npm run build && node --test test/error-handling.test.js",
     "test:npm": "npm run build && node --test test/npm-integration.test.js",
+    "test:interactive": "npm run build && node --test test/interactive.test.js",
     "test:coverage": "npm run build && c8 --reporter=text --reporter=html node --test test/*.test.js",
     "test:coverage:lcov": "npm run build && c8 --reporter=lcov --reports-dir=coverage node --test test/*.test.js",
     "test:coverage:sonar": "npm run test:coverage:lcov && npm run coverage:sonar-format",
@@ -26,7 +27,12 @@
   "description": "",
   "dependencies": {
     "commander": "^14.0.0",
-    "node-fetch": "^2.7.0"
+    "ink": "^6.0.1",
+    "ink-big-text": "^2.0.0",
+    "ink-select-input": "^6.2.0",
+    "ink-text-input": "^6.0.0",
+    "node-fetch": "^3.3.2",
+    "react": "^19.1.0"
   },
   "bin": {
     "pkg-to-csv": "./dist/index.js"
@@ -35,9 +41,12 @@
     "dist/**/*"
   ],
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
     "@types/node": "^24.0.10",
     "@types/node-fetch": "^2.6.12",
-    "typescript": "^5.8.3",
-    "c8": "^10.1.2"
+    "@types/react": "^19.0.1",
+    "c8": "^10.1.2",
+    "typescript": "^5.8.3"
   }
 }
